@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html ng-app="LoginApp">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="سامانه احراز هویت ثنا" />
+    <meta name="keywords" content="ثنا ، ثبت نام الکترونیک قضایی" />
+    <title>سامانه احراز هویت ثنا | Sana Authentication</title>    
+    
+<link href="/cassette.axd/asset/Bundles/bootstrap/bootstrap.rtl.min.css?efc75079698ce37643da67a79ebdf0a4b73c7b32" type="text/css" rel="stylesheet"/>
+<link href="/cassette.axd/asset/Bundles/style.min.css?d8d4f807fc9b6b2ea95a0ea4ab54ca23f3a55211" type="text/css" rel="stylesheet"/>
+
+    
+<script src="/cassette.axd/asset/Bundles/jquery/jquery.min.js?2c313599da463c626b8473b677f4465fc279dacb" type="text/javascript"></script>
+<script src="/cassette.axd/asset/Bundles/angular/angular.min.js?77e3ed039a895dc4478dae11a0ad440f792f0e5c" type="text/javascript"></script>
+<script src="/cassette.axd/asset/Bundles/angular/angular-sanitize.min.js?379c811b4e9c2b2d16571b961a451a39e741cea9" type="text/javascript"></script>
+<script src="/cassette.axd/asset/Bundles/angular/angular-md5.min.js?2d1e27b08406e778d0e9ca2d3f72c6c28307fee0" type="text/javascript"></script>
+<script src="/cassette.axd/asset/Bundles/judMain/judMain.min.js?d58581be9ac90704ee29ca2bbba293ad7f7dbfbf" type="text/javascript"></script>
+<script src="/cassette.axd/asset/Bundles/angular-ui-bootstrap/angular-ui-bootstrap-tpls.min.js?73dc7bbcf117252bafa50bdccbd7df361332dffa" type="text/javascript"></script>
+<script src="/cassette.axd/asset/Bundles/ngDevice/ng-device-detector.min.js?ec11fbbf0189abb693e082573822e38afcc8766a" type="text/javascript"></script>
+<script src="/cassette.axd/asset/Bundles/ngDevice/re-tree.min.js?7466754ad469cb77d7080924fa36132bf4f8ca32" type="text/javascript"></script>
+<script src="/cassette.axd/asset/Bundles/ngDevice/ng-jwtToken.js?efebe83b9d16ad874a8ed95ce886bfc5f6c661d5" type="text/javascript"></script>
+<script src="/cassette.axd/asset/Bundles/ngDevice/ng-browserCheck.js?9b00162b4bbfd0fea0574c7072906d75a339da13" type="text/javascript"></script>
+<script src="/cassette.axd/asset/Bundles/ngFocus/focusIf.min.js?020e0ac5f5820e68dfc9b250ce2d61b12d91b800" type="text/javascript"></script>
+<script src="/cassette.axd/asset/Bundles/lodash/lodash.min.js?fd65eee6f7dc6588dda0fb1291a2a18556be5ecd" type="text/javascript"></script>
+
+</head>
+<body ng-controller="LoginController" ng-csp="no-unsafe-eval | no-inline-style" oncontextmenu="return false">
+    <input type="hidden" name="AntiForgeryToken" id="AntiForgeryToken" value="1747611892" />
+    
+<div class="w-100 d-md-none" ng-if="viewModel.deviceType==2 || viewModel.deviceType==3">
+    <div class="w-100">
+        <div class="M-BgTopLogo"></div>
+        <div class="M-LogoContent">
+            <div class="M-LogoPicBox adl-logo">
+                <img src="/Bundles/images/adliran_logo.png" class="shimmer">
+            </div>
+            <h1 class="text-h5 mt-2 text-primary text-w-900">سامانه احراز هویت ثنا</h1>
+            <p class="text-muted text-center text-w-500 mb-0">
+                {{viewModel.loginTitle}}
+            </p>
+        </div>
+    </div>
+    <div class="container">
+        <form name="frmMobileAuthenticate" id="frmMobileAuthenticate" role="form" ng-keypress="actions.preventEnterKey($event,1)" novalidate ng-if="viewModel.loginStep==1">
+            <div class="row">
+                <div class="login-tab mx-auto mt-4">
+                    <div class="login-tab-item active" ng-class="{'active':viewModel.personLoginType==1}" ng-click="actions.setPersonLoginType(1)" ng-if="viewModel.isSelectNaturalPerson" ng-cloak>
+                        <span>حقیقی ایرانی</span>
+                    </div>
+                    <div class="login-tab-item" ng-class="{'active':viewModel.personLoginType==4}" ng-click="actions.setPersonLoginType(4)" ng-if="viewModel.isSelectNaturalForigenPerson" ng-cloak>
+                        <span>حقیقی غیر ایرانی</span>
+                    </div>
+                    <div class="login-tab-item" ng-class="{'active':viewModel.personLoginType==2}" ng-click="actions.setPersonLoginType(2)" ng-if="viewModel.isSelectLegalPerson" ng-cloak>
+                        <span>شخص حقوقی</span>
+                    </div>
+                    <div class="login-tab-item" ng-class="{'active':viewModel.personLoginType==3}" ng-click="actions.setPersonLoginType(3)" ng-if="viewModel.isSelectJudPerson" ng-cloak>
+                        <span>سمت قضایی</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 mx-auto">
+                    <div class="w-100 mt-4">
+                        <div ng-if="viewModel.personLoginType!=4 && viewModel.personLoginType!=2" ng-cloak>
+                            <label>
+                                <span class="text-h6 text-w-500">شماره ملی</span>
+                                <span class="text-muted small mb-0">(شماره ملی ثبت شده در ثنا)</span>
+                            </label>
+                            <input id="mobilePersonNationalCode" name="mobilePersonNationalCode" type="text"
+                                   autofocus="autofocus" focus-if="1==1"
+                                   class="form-control text-end h-40" autocomplete="off"
+                                   maxLength="10" ng-maxLength="10" ng-minLength="10"
+                                   ng-keypress="actions.preventCharKey($event)"
+                                   ng-model="login.nationalityCode">
+                        </div>
+                        <div ng-if="viewModel.personLoginType==2" ng-cloak>
+                            <label>
+                                <span class="text-h6 text-w-500">شماره ملی/شناسه فیدا</span>
+                                <span class="text-muted small mb-0">(شماره ملی/شناسه فیدای ثبت شده در ثنا)</span>
+                            </label>                            
+                            <input id="mobilePersonNationalCode" name="mobilePersonNationalCode" type="text"
+                                   autofocus="autofocus" focus-if="1==1"
+                                   class="form-control text-end h-40" autocomplete="off"
+                                   maxLength="12" ng-maxLength="12" ng-minLength="10"
+                                   ng-keypress="actions.preventCharKey($event)"
+                                   ng-model="login.nationalityCode">
+                        </div>
+                        <div class="mt-2" ng-if="viewModel.personLoginType==4" ng-cloak>
+                            <label>
+                                <span class="text-h6 text-w-500">شناسه فیدا</span>
+                                <span class="text-muted small mb-0">(شناسه فیدای ثبت شده در ثنا)</span>
+                            </label>
+                            <input id="mobileAtbaPersonNationalCode" name="mobileAtbaPersonNationalCode" type="text"
+                                   autofocus="autofocus" focus-if="1==1"
+                                   class="form-control text-end h-40" autocomplete="off"
+                                   maxLength="12" ng-maxLength="12" ng-minLength="12"
+                                   ng-keypress="actions.preventCharKey($event)"
+                                   ng-model="login.nationalityCode">
+                        </div>
+                        <div class="mt-2" ng-if="viewModel.personLoginType==4" ng-cloak>
+                            <label>
+                                <span class="text-h6 text-w-500">رمز شخصی</span>
+                                <span class="text-muted small mb-0">(رمز شخصی اخذ شده از ثنا)</span>
+                            </label>
+                            <input id="mobileAtbaPersonUserPassword" name="mobileAtbaPersonUserPassword" type="password"
+                                   autocomplete="off" focus-if="login.nationalityCode.length==12"
+                                   class="form-control text-end h-40"
+                                   ng-model="login.userPassword">
+                        </div>
+                        <div class="mt-2" ng-if="viewModel.personLoginType!=4 && viewModel.personLoginType!=2" ng-cloak>
+                            <label>
+                                <span class="text-h6 text-w-500">رمز شخصی</span>
+                                <span class="text-muted small mb-0">(رمز شخصی اخذ شده از ثنا)</span>
+                            </label>
+                            <input id="mobilePersonUserPassword" name="mobilePersonUserPassword" type="password"
+                                   autocomplete="off" focus-if="login.nationalityCode.length==10"
+                                   class="form-control text-end h-40"
+                                   ng-model="login.userPassword">
+                        </div>
+                        <div class="mt-2" ng-if="viewModel.personLoginType==2" ng-cloak>
+                            <label>
+                                <span class="text-h6 text-w-500">رمز شخصی</span>
+                                <span class="text-muted small mb-0">(رمز شخصی اخذ شده از ثنا)</span>
+                            </label>
+                            <input id="mobilePersonUserPassword" name="mobilePersonUserPassword" type="password"
+                                   autocomplete="off" focus-if="login.nationalityCode.length==12"
+                                   class="form-control text-end h-40"
+                                   ng-model="login.userPassword">
+                        </div>
+                        <div class="mt-2" ng-if="viewModel.personLoginType==2" ng-cloak>
+                            <label>
+                                <span class="text-h6 text-w-500">شناسه حقوقی</span>
+                                <span class="text-muted small mb-0">(شناسه 11 رقمی اخذ شده از ثبت اسناد)</span>
+                            </label>
+                            <input id="mobileLegalIdentity" name="mobileLegalIdentity" type="text"
+                                   class="form-control text-end h-40"
+                                   maxlength="11" ng-maxLength="11" ng-minlength="11"
+                                   ng-model="login.legalIdentity">
+                        </div>
+                        <div class="mt-2" ng-if="viewModel.personLoginType==3" ng-cloak>
+                            <label>
+                                <span class="text-h6 text-w-500">کد واحد قضایی</span>
+                                <span class="text-muted small mb-0">(کد واحدی که برای آن حساب کاربری تعریف شده)</span>
+                            </label>
+                            <input id="mobilePersonUnitCode" name="mobilePersonUnitCode" type="text"
+                                   autocomplete="off" class="form-control text-end h-40"
+                                   maxlength="6" ng-maxLength="6" ng-model="login.unitCode">
+                        </div>
+                        <div class="w-100 mt-3" ng-if="!(viewModel.errorMessage==undefined || viewModel.errorMessage==null || viewModel.errorMessage=='')" ng-cloak>
+    <div class="alert alert-danger alert-dismissible fade show py-2 mb-0" role="alert">
+        <p class="mb-0" ng-bind-html="viewModel.errorMessage" ng-cloak></p>
+        <button type="button" class="btn-close p-3" data-bs-dismiss="alert" aria-label="Close" ng-click="actions.clearMessage()"></button>
+    </div>
+</div>
+
+<div class="w-100 mt-3" ng-if="!(viewModel.successMessage==undefined || viewModel.successMessage==null || viewModel.successMessage=='')" ng-cloak>
+    <div class="alert alert-success alert-dismissible fade show py-2 mb-0" role="alert">
+        <p class="mb-0" ng-bind-html="viewModel.successMessage" ng-cloak></p>
+        <button type="button" class="btn-close p-3" data-bs-dismiss="alert" aria-label="Close" ng-click="actions.clearMessage()"></button>
+    </div>
+</div>
+
+<div class="w-100 mt-3" ng-if="!(viewModel.warningMessage==undefined || viewModel.warningMessage==null || viewModel.warningMessage=='')" ng-cloak>
+    <div class="alert alert-warning alert-dismissible fade show py-2 mb-0" role="alert">
+        <p class="mb-0" ng-bind-html="viewModel.warningMessage" ng-cloak></p>
+        <button type="button" class="btn-close p-3" data-bs-dismiss="alert" aria-label="Close" ng-click="actions.clearMessage()"></button>
+    </div>
+</div>
+
+<div class="w-100 mt-3" ng-if="!(viewModel.infoMessage==undefined || viewModel.infoMessage==null || viewModel.infoMessage=='')" ng-cloak>
+    <div class="alert alert-info alert-dismissible fade show py-2 mb-0" role="alert">
+        <p class="mb-0" ng-bind-html="viewModel.infoMessage" ng-cloak></p>
+        <button type="button" class="btn-close p-3" data-bs-dismiss="alert" aria-label="Close" ng-click="actions.clearMessage()"></button>
+    </div>
+</div>
+
+                        <button class="btn btn-primary w-100 h-40 mt-3"
+                                ng-disabled="viewModel.loading"
+                                ng-click="actions.checkPersonLogin()">
+                            <span class="spinner-border spinner-border-sm mx-1" role="status" aria-hidden="true" ng-if="viewModel.loading"></span>
+                            مرحله بعد
+                        </button>
+                        <div class="d-flex align-items-center justify-content-between mt-3">
+                            <a href="https://sana.adliran.ir/Sana/Index#/ForgetPassword" class="text-red d-flex align-items-center text-decoration-none" target="_blank" ng-if="viewModel.personLoginType!=4" ng-cloak>
+                                رمز خود را فراموش کرده‌ام!
+                            </a>
+                            <a href="https://adliran.ir/home/GetFidaCodeFromSana" class="text-red d-flex align-items-center text-decoration-none" target="_blank" ng-if="viewModel.personLoginType==4" ng-cloak>
+                                شناسه فیدای خود را فراموش کرده‌ام!
+                            </a>
+                            <a href="https://sana.adliran.ir" class="text-link d-flex align-items-center text-decoration-none" target="_blank">
+                                ثبت نام در ثنا
+                            </a>
+                        </div>
+                        <div class="VerticalGap"></div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <form name="frmMobileCheckOTP" id="frmMobileCheckOTP" role="form" ng-keypress="actions.preventEnterKey($event,2)" novalidate ng-if="viewModel.loginStep==2">
+            <div class="card card-fix mt-4" ng-if="viewModel.isShowAlert">
+                <div class="card-body p-lg-5 py-4 px-4">
+                    <div class="row">
+                        <p class="mb-0 text-secondary text-w-700">
+                            <span>
+                                <svg width="24" height="24" class="svg-secondary" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M12 8V13" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M11.9945 16H12.0035" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                            </span>
+                            رمز موقت قبلا برای شما ارسال شده است.
+                        </p>
+                        <div class="col-12 mt-4">
+                            <p class="mb-1">شما می‌توانید از طریق <span class="text-w-500">سامانه پیامکی</span>، رمز موقت دلخواه خود را تعیین کنید.</p>
+                        </div>
+                        <div class="col-12">
+                            <p class="mb-1">فقط کافیست <code class="code"><span>5</span><span>#</span><span>کدملی</span><span>#</span><span>رمزموقت</span></code> را به شماره <span class="text-w-700 text-primary">500049</span> پیامک کنید.</p>
+                        </div>
+                        <div class="col-12">
+                            <p class="mb-0 d-flex align-items-center justify-content-between text-muted">
+                                <span>مثال:</span>
+                                <span ng-cloak>5#{{login.nationalityCode || '0123456789'}}#12345</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 mx-auto">
+                    <div class="w-100 mt-4">
+                        <div>
+                            <label>
+                                <span class="text-h6 text-w-500">رمز موقت</span>
+                                <span class="text-muted small mb-0">(رمزی که برای شما پیامک شده)</span>
+                            </label>
+                            <input id="mobileOtpPassowrd" name="mobileOtpPassowrd" type="password"
+                                   autofocus="autofocus" focus-if="1==1"
+                                   class="form-control text-end h-40" autocomplete="off"
+                                   maxLength="10" ng-maxLength="10"
+                                   ng-keypress="actions.preventCharKey($event)"
+                                   ng-model="login.otpPassword">
+                        </div>
+                        <div class="w-100 mt-3" ng-if="!(viewModel.errorMessage==undefined || viewModel.errorMessage==null || viewModel.errorMessage=='')" ng-cloak>
+    <div class="alert alert-danger alert-dismissible fade show py-2 mb-0" role="alert">
+        <p class="mb-0" ng-bind-html="viewModel.errorMessage" ng-cloak></p>
+        <button type="button" class="btn-close p-3" data-bs-dismiss="alert" aria-label="Close" ng-click="actions.clearMessage()"></button>
+    </div>
+</div>
+
+<div class="w-100 mt-3" ng-if="!(viewModel.successMessage==undefined || viewModel.successMessage==null || viewModel.successMessage=='')" ng-cloak>
+    <div class="alert alert-success alert-dismissible fade show py-2 mb-0" role="alert">
+        <p class="mb-0" ng-bind-html="viewModel.successMessage" ng-cloak></p>
+        <button type="button" class="btn-close p-3" data-bs-dismiss="alert" aria-label="Close" ng-click="actions.clearMessage()"></button>
+    </div>
+</div>
+
+<div class="w-100 mt-3" ng-if="!(viewModel.warningMessage==undefined || viewModel.warningMessage==null || viewModel.warningMessage=='')" ng-cloak>
+    <div class="alert alert-warning alert-dismissible fade show py-2 mb-0" role="alert">
+        <p class="mb-0" ng-bind-html="viewModel.warningMessage" ng-cloak></p>
+        <button type="button" class="btn-close p-3" data-bs-dismiss="alert" aria-label="Close" ng-click="actions.clearMessage()"></button>
+    </div>
+</div>
+
+<div class="w-100 mt-3" ng-if="!(viewModel.infoMessage==undefined || viewModel.infoMessage==null || viewModel.infoMessage=='')" ng-cloak>
+    <div class="alert alert-info alert-dismissible fade show py-2 mb-0" role="alert">
+        <p class="mb-0" ng-bind-html="viewModel.infoMessage" ng-cloak></p>
+        <button type="button" class="btn-close p-3" data-bs-dismiss="alert" aria-label="Close" ng-click="actions.clearMessage()"></button>
+    </div>
+</div>
+
+                        <button class="btn btn-primary w-100 h-40 mt-3"
+                                ng-disabled="viewModel.loading || viewModel.isSendingOtpPassword"
+                                ng-click="actions.checkPersonOtpLogin()">
+                            <span class="spinner-border spinner-border-sm mx-1" role="status" aria-hidden="true" ng-if="viewModel.loading"></span>
+                            ورود به سامانه
+                        </button>
+                        <div class="d-flex align-items-center justify-content-between mt-3">
+                            <span ng-click="actions.sendOtpPasswordForPerson()"
+                                  class="text-link cursor-pointer"
+                                  ng-disabled="viewModel.loadingLogout || viewModel.loading || viewModel.isSendingOtpPassword">
+                                <span class="spinner-border spinner-border-sm mx-1" role="status" aria-hidden="true" ng-if="viewModel.isSendingOtpPassword"></span>
+                                ارسال مجدد رمز موقت
+                            </span>
+                            <span class="text-primary cursor-pointer"
+                                  ng-disabled="viewModel.loadingLogout || viewModel.loading || viewModel.isSendingOtpPassword"
+                                  ng-click="actions.prevStepLogin()">
+                                مرحله قبل
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="VerticalGap"></div>
+        </form>
+    </div>
+</div>
+<div class="w-100 h-full d-none d-md-block" ng-if="viewModel.deviceType==1" ng-cloak>
+    <div class="row h-full m-0">
+        <div class="col-xl-5 col-lg-6 col-md-7 h-full d-flex flex-column justify-content-center align-items-center p-0">
+            <div class="row">
+                <div class="d-flex flex-column align-items-center justify-content-center adl-logo">
+                    <img src="/Bundles/images/adliran_logo.png" class="shimmer">
+                    <h1 class="text-h5 mt-2 text-primary text-w-900">سامانه احراز هویت ثنا</h1>
+                    <p class="text-muted text-center text-w-500 mb-0" ng-cloak>
+                        {{viewModel.loginTitle}}
+                    </p>
+                </div>
+            </div>
+            <form name="frmAuthenticate" id="frmAuthenticate" role="form" ng-keypress="actions.preventEnterKey($event,1)" novalidate ng-if="viewModel.loginStep==1 && viewModel.isSuportDevice">
+                <div class="row">
+                    <div class="col-12 mx-auto">
+                        <div class="login-tab w-400 mt-4">
+                            <div class="login-tab-item active" ng-class="{'active':viewModel.personLoginType==1}" ng-click="actions.setPersonLoginType(1)" ng-if="viewModel.isSelectNaturalPerson" ng-cloak>
+                                <span>حقیقی ایرانی</span>
+                            </div>
+                            <div class="login-tab-item" ng-class="{'active':viewModel.personLoginType==4}" ng-click="actions.setPersonLoginType(4)" ng-if="viewModel.isSelectNaturalForigenPerson" ng-cloak>
+                                <span>حقیقی غیر ایرانی</span>
+                            </div>
+                            <div class="login-tab-item" ng-class="{'active':viewModel.personLoginType==2}" ng-click="actions.setPersonLoginType(2)" ng-if="viewModel.isSelectLegalPerson" ng-cloak>
+                                <span>حقوقی</span>
+                            </div>
+                            <div class="login-tab-item" ng-class="{'active':viewModel.personLoginType==3}" ng-click="actions.setPersonLoginType(3)" ng-if="viewModel.isSelectJudPerson" ng-cloak>
+                                <span>سمت قضایی</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 mx-auto">
+                        <div class="w-400 mt-4">
+                            <div ng-if="viewModel.personLoginType!=4 && viewModel.personLoginType!=2" ng-cloak>
+                                <label>
+                                    <span class="text-h6 text-w-500">شماره ملی</span>
+                                    <span class="text-muted small mb-0">(شماره ملی ثبت شده در ثنا)</span>
+                                </label>
+                                <input id="personNationalCode" name="personNationalCode" type="text"
+                                       autofocus="autofocus" focus-if="1==1"
+                                       class="form-control text-end h-40" autocomplete="off"
+                                       maxLength="10" ng-maxLength="10" ng-minLength="10"
+                                       ng-keypress="actions.preventCharKey($event)"
+                                       ng-model="login.nationalityCode">
+                            </div>
+                            <div ng-if="viewModel.personLoginType==2" ng-cloak>
+                                <label>
+                                    <span class="text-h6 text-w-500">شماره ملی/شناسه فیدا</span>
+                                    <span class="text-muted small mb-0">(شماره ملی/شناسه فیدای ثبت شده در ثنا)</span>
+                                </label>
+                                <input id="personNationalCode" name="personNationalCode" type="text"
+                                       autofocus="autofocus" focus-if="1==1"
+                                       class="form-control text-end h-40" autocomplete="off"
+                                       maxLength="12" ng-maxLength="12" ng-minLength="10"
+                                       ng-keypress="actions.preventCharKey($event)"
+                                       ng-model="login.nationalityCode">
+                            </div>
+                            <div class="mt-2" ng-if="viewModel.personLoginType==4" ng-cloak>
+                                <label>
+                                    <span class="text-h6 text-w-500">شناسه فیدا</span>
+                                    <span class="text-muted small mb-0">(شناسه فیدای ثبت شده در ثنا)</span>
+                                </label>
+                                <input id="atbaPersonNationalCode" name="atbaPersonNationalCode" type="text"
+                                       autofocus="autofocus" focus-if="1==1"
+                                       class="form-control text-end h-40" autocomplete="off"
+                                       maxLength="12" ng-maxLength="12" ng-minLength="12"
+                                       ng-keypress="actions.preventCharKey($event)"
+                                       ng-model="login.nationalityCode">
+                            </div>
+                            <div class="mt-2" ng-if="viewModel.personLoginType==4" ng-cloak>
+                                <label>
+                                    <span class="text-h6 text-w-500">رمز شخصی</span>
+                                    <span class="text-muted small mb-0">(رمز شخصی اخذ شده از ثنا)</span>
+                                </label>
+                                <input id="atbaPersonUserPassword" name="atbaPersonUserPassword" type="password"
+                                       autocomplete="off" focus-if="login.nationalityCode.length==12"
+                                       class="form-control text-end h-40"
+                                       ng-model="login.userPassword">
+                            </div>
+                            <div class="mt-2" ng-if="viewModel.personLoginType!=4 && viewModel.personLoginType!=2" ng-cloak>
+                                <label>
+                                    <span class="text-h6 text-w-500">رمز شخصی</span>
+                                    <span class="text-muted small mb-0">(رمز شخصی اخذ شده از ثنا)</span>
+                                </label>
+                                <input id="personUserPassword" name="personUserPassword" type="password"
+                                       autocomplete="off" focus-if="login.nationalityCode.length==10"
+                                       class="form-control text-end h-40"
+                                       ng-model="login.userPassword">
+                            </div>
+                            <div class="mt-2" ng-if="viewModel.personLoginType==2" ng-cloak>
+                                <label>
+                                    <span class="text-h6 text-w-500">رمز شخصی</span>
+                                    <span class="text-muted small mb-0">(رمز شخصی اخذ شده از ثنا)</span>
+                                </label>
+                                <input id="personUserPassword" name="personUserPassword" type="password"
+                                       autocomplete="off" focus-if="login.nationalityCode.length==12"
+                                       class="form-control text-end h-40"
+                                       ng-model="login.userPassword">
+                            </div>
+                            <div class="mt-2" ng-if="viewModel.personLoginType==2" ng-cloak>
+                                <label>
+                                    <span class="text-h6 text-w-500">شناسه حقوقی</span>
+                                    <span class="text-muted small mb-0">(شناسه 11 رقمی اخذ شده از ثبت اسناد)</span>
+                                </label>
+                                <input id="legalIdentity" name="legalIdentity" type="text"
+                                       class="form-control text-end h-40"
+                                       maxlength="11" ng-maxLength="11" ng-minlength="11"
+                                       ng-model="login.legalIdentity">
+                            </div>
+                            <div class="mt-2" ng-if="viewModel.personLoginType==3" ng-cloak>
+                                <label>
+                                    <span class="text-h6 text-w-500">کد واحد قضایی</span>
+                                    <span class="text-muted small mb-0">(کد واحدی که برای آن حساب کاربری تعریف شده)</span>
+                                </label>
+                                <input id="personUnitCode" name="personUnitCode" type="text"
+                                       autocomplete="off" class="form-control text-end h-40"
+                                       maxlength="6" ng-maxLength="6" ng-model="login.unitCode">
+                            </div>
+                            <div class="w-100 mt-3" ng-if="!(viewModel.errorMessage==undefined || viewModel.errorMessage==null || viewModel.errorMessage=='')" ng-cloak>
+    <div class="alert alert-danger alert-dismissible fade show py-2 mb-0" role="alert">
+        <p class="mb-0" ng-bind-html="viewModel.errorMessage" ng-cloak></p>
+        <button type="button" class="btn-close p-3" data-bs-dismiss="alert" aria-label="Close" ng-click="actions.clearMessage()"></button>
+    </div>
+</div>
+
+<div class="w-100 mt-3" ng-if="!(viewModel.successMessage==undefined || viewModel.successMessage==null || viewModel.successMessage=='')" ng-cloak>
+    <div class="alert alert-success alert-dismissible fade show py-2 mb-0" role="alert">
+        <p class="mb-0" ng-bind-html="viewModel.successMessage" ng-cloak></p>
+        <button type="button" class="btn-close p-3" data-bs-dismiss="alert" aria-label="Close" ng-click="actions.clearMessage()"></button>
+    </div>
+</div>
+
+<div class="w-100 mt-3" ng-if="!(viewModel.warningMessage==undefined || viewModel.warningMessage==null || viewModel.warningMessage=='')" ng-cloak>
+    <div class="alert alert-warning alert-dismissible fade show py-2 mb-0" role="alert">
+        <p class="mb-0" ng-bind-html="viewModel.warningMessage" ng-cloak></p>
+        <button type="button" class="btn-close p-3" data-bs-dismiss="alert" aria-label="Close" ng-click="actions.clearMessage()"></button>
+    </div>
+</div>
+
+<div class="w-100 mt-3" ng-if="!(viewModel.infoMessage==undefined || viewModel.infoMessage==null || viewModel.infoMessage=='')" ng-cloak>
+    <div class="alert alert-info alert-dismissible fade show py-2 mb-0" role="alert">
+        <p class="mb-0" ng-bind-html="viewModel.infoMessage" ng-cloak></p>
+        <button type="button" class="btn-close p-3" data-bs-dismiss="alert" aria-label="Close" ng-click="actions.clearMessage()"></button>
+    </div>
+</div>
+
+                            <button class="btn btn-primary w-100 h-40 mt-3"
+                                    ng-disabled="viewModel.loading"
+                                    ng-click="actions.checkPersonLogin()">
+                                <span class="spinner-border spinner-border-sm mx-1" role="status" aria-hidden="true" ng-if="viewModel.loading"></span>
+                                مرحله بعد
+                            </button>
+                            <div class="d-flex align-items-center justify-content-between mt-3">
+                                <a href="https://sana.adliran.ir/Sana/Index#/ForgetPassword" class="text-red d-flex align-items-center text-decoration-none" target="_blank" ng-if="viewModel.personLoginType!=4" ng-cloak>
+                                    رمز خود را فراموش کرده‌ام!
+                                </a>
+                                <a href="https://adliran.ir/home/GetFidaCodeFromSana" class="text-red d-flex align-items-center text-decoration-none" target="_blank" ng-if="viewModel.personLoginType==4" ng-cloak>
+                                    شناسه فیدای خود را فراموش کرده‌ام!
+                                </a>
+                                <a href="https://sana.adliran.ir" class="text-link d-flex align-items-center text-decoration-none" target="_blank">
+                                    ثبت‌نام در ثنا
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <form name="frmCheckOTP" id="frmCheckOTP" role="form" ng-keypress="actions.preventEnterKey($event,2)" novalidate ng-if="viewModel.loginStep==2 && viewModel.isSuportDevice">
+                <div class="card card-fix mt-4 w-400" ng-if="viewModel.isShowAlert">
+                    <div class="card-body p-lg-5 py-4 px-4">
+                        <div class="row">
+                            <p class="mb-0 text-secondary text-w-700">
+                                <span>
+                                    <svg width="24" height="24" class="svg-secondary" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        <path d="M12 8V13" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        <path d="M11.9945 16H12.0035" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>
+                                </span>
+                                رمز موقت قبلا برای شما ارسال شده است.
+                            </p>
+                            <div class="col-12 mt-4">
+                                <p class="mb-1">شما می‌توانید از طریق <span class="text-w-500">سامانه پیامکی</span>، رمز موقت دلخواه خود را تعیین کنید.</p>
+                            </div>
+                            <div class="col-12">
+                                <p class="mb-1">فقط کافیست <code class="code"><span>5</span><span>#</span><span>کدملی</span><span>#</span><span>رمزموقت</span></code> را به شماره <span class="text-w-700 text-primary">500049</span> پیامک کنید.</p>
+                            </div>
+                            <div class="col-12">
+                                <p class="mb-0 d-flex align-items-center justify-content-between text-muted">
+                                    <span>مثال:</span>
+                                    <span ng-cloak>5#{{login.nationalityCode || '0123456789'}}#12345</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 mx-auto">
+                        <div class="w-400 mt-4">
+                            <div>
+                                <label>
+                                    <span class="text-h6 text-w-500">رمز موقت</span>
+                                    <span class="text-muted small mb-0">(رمزی که برای شما پیامک شده)</span>
+                                </label>
+                                <input id="otpPassowrd" name="otpPassowrd" type="password"
+                                       autofocus="autofocus" focus-if="1==1"
+                                       class="form-control text-end h-40" autocomplete="off"
+                                       maxLength="10" ng-maxLength="10"
+                                       ng-keypress="actions.preventCharKey($event)"
+                                       ng-model="login.otpPassword">
+                            </div>
+                            <div class="w-100 mt-3" ng-if="!(viewModel.errorMessage==undefined || viewModel.errorMessage==null || viewModel.errorMessage=='')" ng-cloak>
+    <div class="alert alert-danger alert-dismissible fade show py-2 mb-0" role="alert">
+        <p class="mb-0" ng-bind-html="viewModel.errorMessage" ng-cloak></p>
+        <button type="button" class="btn-close p-3" data-bs-dismiss="alert" aria-label="Close" ng-click="actions.clearMessage()"></button>
+    </div>
+</div>
+
+<div class="w-100 mt-3" ng-if="!(viewModel.successMessage==undefined || viewModel.successMessage==null || viewModel.successMessage=='')" ng-cloak>
+    <div class="alert alert-success alert-dismissible fade show py-2 mb-0" role="alert">
+        <p class="mb-0" ng-bind-html="viewModel.successMessage" ng-cloak></p>
+        <button type="button" class="btn-close p-3" data-bs-dismiss="alert" aria-label="Close" ng-click="actions.clearMessage()"></button>
+    </div>
+</div>
+
+<div class="w-100 mt-3" ng-if="!(viewModel.warningMessage==undefined || viewModel.warningMessage==null || viewModel.warningMessage=='')" ng-cloak>
+    <div class="alert alert-warning alert-dismissible fade show py-2 mb-0" role="alert">
+        <p class="mb-0" ng-bind-html="viewModel.warningMessage" ng-cloak></p>
+        <button type="button" class="btn-close p-3" data-bs-dismiss="alert" aria-label="Close" ng-click="actions.clearMessage()"></button>
+    </div>
+</div>
+
+<div class="w-100 mt-3" ng-if="!(viewModel.infoMessage==undefined || viewModel.infoMessage==null || viewModel.infoMessage=='')" ng-cloak>
+    <div class="alert alert-info alert-dismissible fade show py-2 mb-0" role="alert">
+        <p class="mb-0" ng-bind-html="viewModel.infoMessage" ng-cloak></p>
+        <button type="button" class="btn-close p-3" data-bs-dismiss="alert" aria-label="Close" ng-click="actions.clearMessage()"></button>
+    </div>
+</div>
+
+                            <button class="btn btn-primary w-100 h-40 mt-3"
+                                    ng-disabled="viewModel.loading || viewModel.isSendingOtpPassword"
+                                    ng-click="actions.checkPersonOtpLogin()">
+                                <span class="spinner-border spinner-border-sm mx-1" role="status" aria-hidden="true" ng-if="viewModel.loading"></span>
+                                ورود به سامانه
+                            </button>
+                            <div class="d-flex align-items-center justify-content-between mt-3">
+                                <span ng-click="actions.sendOtpPasswordForPerson()"
+                                      class="text-link cursor-pointer"
+                                      ng-disabled="viewModel.loadingLogout || viewModel.loading || viewModel.isSendingOtpPassword">
+                                    <span class="spinner-border spinner-border-sm mx-1" role="status" aria-hidden="true" ng-if="viewModel.isSendingOtpPassword"></span>
+                                    ارسال مجدد رمز موقت
+                                </span>
+                                <span class="text-primary cursor-pointer"
+                                      ng-disabled="viewModel.loadingLogout || viewModel.loading || viewModel.isSendingOtpPassword"
+                                      ng-click="actions.prevStepLogin()">
+                                    مرحله قبل
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+            </form>
+            <div class="card card-fix mt-4 w-400" ng-if="!viewModel.isSuportDevice" ng-cloak>
+                <div class="card-body p-lg-5 py-4 px-4">
+                    <div class="row">
+                        <p class="mb-0 text-secondary text-w-700">
+                            <span>
+                                <svg width="24" height="24" class="svg-secondary" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M12 8V13" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M11.9945 16H12.0035" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                            </span>بروزرسانی مرورگر شما لازم است
+                        </p>
+                        <div class="col-12 mt-4">
+                            <p class="mb-1">
+                                به نظر می‌رسد شما از مرورگر قدیمی استفاده می‌کنید.<br>
+                                برای اینکه بتوانید این صفحه را به بهترین شکل مشاهده کنید، لطفا
+                                مرورگر خود را بروزرسانی کرده یا از مرورگر
+                                <span class="text-w-500">کروم (Chrome)</span>
+                                استفاده کنید.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-7 col-lg-6 col-md-5 h-full login-image p-0">
+            <img src="/Bundles/images/poster-logo.png" class="shimmer">
+        </div>
+    </div>
+</div>
+
+    <script src="/Scripts/Login/LoginController.js"></script>
+    <script src="/Scripts/Login/LoginApp.js"></script>
+</body>
+</html>
